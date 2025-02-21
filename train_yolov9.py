@@ -65,7 +65,6 @@ def train(hyp, opt, device, callbacks):  # hyp is path/to/hyp.yaml or hyp dictio
     results_file = save_dir / 'results.txt'
     if opt.rwe > 0:
         results_file_rwe = save_dir / 'results_rwe.txt'
-    breakpoint()
     # Hyperparameters
     if isinstance(hyp, str):
         with open(hyp, errors='ignore') as f:
