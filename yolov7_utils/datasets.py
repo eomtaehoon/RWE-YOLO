@@ -78,7 +78,7 @@ def create_dataloader(path, imgsz, batch_size, stride, opt, hyp=None, augment=Fa
                                       prefix=prefix,
                                       opt=opt,
                                       rwe=rwe,
-                                      brightness=1.0)
+                                      brightness=brightness)
 
     batch_size = min(batch_size, len(dataset))
     nw = min([os.cpu_count() // world_size, batch_size if batch_size > 1 else 0, workers])  # number of workers
@@ -691,14 +691,14 @@ def load_image(self, index):
                 if random.random() < self.opt.rwe:
                     values =  np.concatenate([np.linspace(0.1, 0.9, 9),np.linspace(1, 10, 10)])
                     random_value = np.round(np.random.choice(values),2)
-                    im = adjust_rwe(im, random_value)
+                    img = adjust_rwe(img, random_value)
         else:
             values = self.brightness
             if self.rwe:
-                im = adjust_rwe(im, values)
+                img = adjust_rwe(img, values)
             else:
-                im = np.float32(im)*values
-        im = np.clip(im, 0, 255).astype(np.uint8)
+                img = np.float32(img)*values
+        img = np.clip(img, 0, 255).astype(np.uint8)
         return img, (h0, w0), img.shape[:2]  # img, hw_original, hw_resized
     else:
         return self.imgs[index], self.img_hw0[index], self.img_hw[index]  # img, hw_original, hw_resized
