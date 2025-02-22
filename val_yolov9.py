@@ -108,7 +108,9 @@ def run(
         callbacks=Callbacks(),
         compute_loss=None,
         rwe=False,
-        brightness=1.0):
+        brightness=1.0,
+        hdr=False,
+        blur=1):
     # Initialize/load model and set device
     training = model is not None
     if training:  # called by train.py
@@ -160,6 +162,7 @@ def run(
                                        imgsz,
                                        batch_size,
                                        stride,
+                                       opt,
                                        single_cls,
                                        pad=pad,
                                        rect=rect,
@@ -355,6 +358,8 @@ def parse_opt():
     parser.add_argument('--min-items', type=int, default=0, help='Experimental')
     parser.add_argument('--rwe', action='store_true', help='Row-wise exposure Image Test')
     parser.add_argument('--brightness', type=float, default=1.0, help='Brigtness Variation Test')
+    parser.add_argument('--hdr', action='store_true', help='multi exposure hdr Image Test')
+    parser.add_argument('--blur', type=int, default=1, help='blur Test (Kernel size)')
     opt = parser.parse_args()
     opt.data = check_yaml(opt.data)  # check YAML
     opt.save_json |= opt.data.endswith('coco.yaml')

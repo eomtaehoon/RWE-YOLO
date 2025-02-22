@@ -738,6 +738,29 @@ class LoadImagesAndLabels(Dataset):
         image[::3] = image[::3]*2.0
         image[2::3] = image[2::3]/2.0
         return image
+    
+    def multi_exposure(self, image, factor, blur):
+        image = np.float32(image)
+        image = image*factor
+        im_t = image*2.0
+        im_b = image/2.0
+        merge_mertens = cv2.createMergeMertens()
+        images = [np.clip(im_t, 0, 255), np.clip(image, 0, 255), np.clip(im_b, 0, 255)]
+        fused_image = merge_mertens.process(images)
+        im_hdr = np.clip(fused_image * 255.0, 0, 255)
+        image = im_hdr
+        if blur != 1:
+            kernel_size = blur
+            if kernel_size < 1:
+                kernel_size = 1
+            kernel = np.zeros((kernel_size, kernel_size))
+            kernel[int((kernel_size - 1) / 2), :] = np.ones(kernel_size)
+            kernel = kernel / kernel_size
+            blurred = cv2.filter2D(image.astype(np.float32), -1, kernel)
+            im_blur = np.clip(blurred, 0, 255)
+            image = im_blur
+        return image
+
 
     def load_image(self, i):
         # Loads 1 image from dataset index 'i', returns (im, original hw, resized hw)
@@ -763,6 +786,8 @@ class LoadImagesAndLabels(Dataset):
                 values = self.brightness
                 if self.rwe:
                     im = self.adjust_rwe(im, values)
+                if self.opt.hdr:
+                    im = self.multi_exposure(im, values, self.opt.blur)    
                 else:
                     im = np.float32(im)*values
             im = np.clip(im, 0, 255).astype(np.uint8)
