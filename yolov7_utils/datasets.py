@@ -718,11 +718,12 @@ def load_image(self, index):
             values = self.brightness
             if self.rwe:
                 img = adjust_rwe(img, values)
-            if self.opt.hdr:
+            elif self.opt.hdr:
                 img = multi_exposure(img, values, self.opt.blur)
             else:
                 img = np.float32(img)*values
-        img = np.clip(img, 0, 255).astype(np.uint8)
+        img = np.clip(img, 0, 255)
+        img = np.uint8(img)
         return img, (h0, w0), img.shape[:2]  # img, hw_original, hw_resized
     else:
         return self.imgs[index], self.img_hw0[index], self.img_hw[index]  # img, hw_original, hw_resized

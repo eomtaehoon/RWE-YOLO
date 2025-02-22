@@ -786,7 +786,7 @@ class LoadImagesAndLabels(Dataset):
                 values = self.brightness
                 if self.rwe:
                     im = self.adjust_rwe(im, values)
-                if self.opt.hdr:
+                elif self.opt.hdr:
                     im = self.multi_exposure(im, values, self.opt.blur)    
                 else:
                     im = np.float32(im)*values
