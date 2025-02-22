@@ -673,6 +673,28 @@ def adjust_rwe(image, factor):
     image[2::3] = image[2::3]/2.0
     return image
 
+def multi_exposure(image, factor, blur):
+    image = np.float32(image)
+    image = image*factor
+    im_t = image*2.0
+    im_b = image/2.0
+    merge_mertens = cv2.createMergeMertens()
+    images = [np.clip(im_t, 0, 255), np.clip(image, 0, 255), np.clip(im_b, 0, 255)]
+    fused_image = merge_mertens.process(images)
+    im_hdr = np.clip(fused_image * 255.0, 0, 255)
+    image = im_hdr
+    if blur != 1:
+        kernel_size = blur
+        if kernel_size < 1:
+            kernel_size = 1
+        kernel = np.zeros((kernel_size, kernel_size))
+        kernel[int((kernel_size - 1) / 2), :] = np.ones(kernel_size)
+        kernel = kernel / kernel_size
+        blurred = cv2.filter2D(image.astype(np.float32), -1, kernel)
+        im_blur = np.clip(blurred, 0, 255)
+        image = im_blur
+    return image
+
 # Ancillary functions --------------------------------------------------------------------------------------------------
 def load_image(self, index):
     # loads 1 image from dataset, returns img, original hw, resized hw
@@ -696,6 +718,8 @@ def load_image(self, index):
             values = self.brightness
             if self.rwe:
                 img = adjust_rwe(img, values)
+            if self.opt.hdr:
+                img = multi_exposure(img, values, self.opt.blur)
             else:
                 img = np.float32(img)*values
         img = np.clip(img, 0, 255).astype(np.uint8)

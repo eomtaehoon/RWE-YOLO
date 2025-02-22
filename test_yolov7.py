@@ -326,6 +326,8 @@ if __name__ == '__main__':
     parser.add_argument('--v5-metric', action='store_true', help='assume maximum recall as 1.0 in AP calculation')
     parser.add_argument('--rwe', action='store_true', help='Row-wise exposure Image Test')
     parser.add_argument('--brightness', type=float, default=1.0, help='Brigtness Variation Test')
+    parser.add_argument('--hdr', action='store_true', help='multi exposure hdr Image Test')
+    parser.add_argument('--blur', type=int, default=1, help='blur Test (Kernel size)')
     opt = parser.parse_args()
     opt.save_json |= opt.data.endswith('coco.yaml')
     opt.data = check_file(opt.data)  # check file
