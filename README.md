@@ -1,5 +1,5 @@
 # RWE-YOLO
-YOLO using Row-wise exposure
+YOLO using Row-wise exposure   
 paper - [TBD]()
 
 ## Performance
